@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
 
     const char* execute  = NULL;
     const char* username = NULL;
-    const char* outPath  = NULL;
+    std::string outPath;
     FILE* outStream      = NULL;
 
     std::deque<FilePtr> filelist;
@@ -202,9 +202,10 @@ int main(int argc, char* argv[])
     Listener listener;
 
     // excluding file list only affect only if process id is not 1
-    if(0 == access(Config::get<std::string>("startup_log_file").c_str(), F_OK))
-        exclude_filenames.push_back(Config::get<std::string>("startup_log_file").c_str());
-    
+    std::string startup_log_file = Config::get<std::string>("startup_log_file");
+    if(0 == access(startup_log_file.c_str(), F_OK))
+        exclude_filenames.push_back(startup_log_file.c_str());
+
     static struct option long_options[] =
         {
             {"verbose",        no_argument,       0, 'v'},
@@ -359,7 +360,7 @@ int main(int argc, char* argv[])
     {
         create_pid_late = true;
 
-        outPath = Config::get<std::string>("startup_log_file").c_str();
+	outPath = Config::get<std::string>("startup_log_file");
         verbose = 0;
     }
     else
@@ -389,14 +390,14 @@ int main(int argc, char* argv[])
     
         if(outStream == stdout)
             logger.redirectStdout2Stderr(true);
-        else if(!outPath)
+        else if(!outPath.c_str())
             outPath = "./e4rat-collect.log";
 
 	/*
          * Parse application list given as arguments
          */
         for ( ; optind < argc; optind++)
-            project.observeApp(fs::path(argv[optind]).filename());
+            project.observeApp(fs::path(argv[optind]).filename().string());
 
         /*
          * Parse application list on stdin
@@ -456,8 +457,9 @@ int main(int argc, char* argv[])
                 }
                 else
                 {
-                    notice("Execute `%s' ...", Config::get<std::string>("init").c_str());
-                    execv(Config::get<std::string>("init").c_str(), argv);
+                    std::string init = Config::get<std::string>("init");
+                    notice("Execute `%s' ...", init.c_str());
+                    execv(init.c_str(), argv);
                 }
                 sleep(1);
                 exit(0);
@@ -478,10 +480,12 @@ int main(int argc, char* argv[])
         }
         else
         {
-            if(pc == false)
+            if(pc == false) {
                 notice("Signal collector to stop by calling `killall %s'");
-            else
-                notice("Signal collector to stop by calling `%s -k'", Config::get<std::string>("tool_name").c_str());
+            } else {
+                std::string tool_name = Config::get<std::string>("tool_name");
+                notice("Signal collector to stop by calling `%s -k'", tool_name.c_str());
+            }
         }
     }
     else
@@ -500,18 +504,18 @@ int main(int argc, char* argv[])
     /*
      * dump file list
      */
-    if(outPath && !outStream)
+    if(outPath.c_str() && !outStream)
     {
-        outStream = fopen(outPath, "w");
+        outStream = fopen(outPath.c_str(), "w");
         if(NULL == outStream)
         {
-            error("Cannot open output file: %s: %s", outPath, strerror(errno));
+            error("Cannot open output file: %s: %s", outPath.c_str(), strerror(errno));
             goto err2;
         }
     }
     
     if(outStream != stdout)
-        notice("Save file list to %s", outPath);
+        notice("Save file list to %s", outPath.c_str());
 
     BOOST_FOREACH(FilePtr f, filelist)
         fprintf(outStream, "%u %u %s\n", (__u32)f.getDevice(), (__u32)f.getInode(), f.getPath().string().c_str());
@@ -523,8 +527,10 @@ err1:
     printUsage();
     exit(1);
 err2:
-    if(getpid() == 1)
-         execv(Config::get<std::string>("init").c_str(), argv);
+    if(getpid() == 1) {
+         std::string init = Config::get<std::string>("init");
+         execv(init.c_str(), argv);
+    }
     unlink(PID_FILE);
     exit(1);
 }

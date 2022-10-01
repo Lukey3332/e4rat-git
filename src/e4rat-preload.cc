@@ -227,13 +227,14 @@ int main(int argc, char* argv[])
     try {
     if(getpid() == 1)
     {
-        const char* logfile = Config::get<std::string>("startup_log_file").c_str();
-        notice("Open %s ... ", logfile);
-        FILE* infile = fopen(logfile, "r");
+	std::string logfile = Config::get<std::string>("startup_log_file");
+        notice("Open %s ... ", logfile.c_str());
+        FILE* infile = fopen(logfile.c_str(), "r");
         if(!infile)
         {
-            error("%s is not accessible", logfile);
-            execv(Config::get<std::string>("init").c_str(), argv);
+            error("%s is not accessible", logfile.c_str());
+            std::string init = Config::get<std::string>("init");
+            execv(init.c_str(), argv);
         }
         
         parseInputStream(infile, filelist);
@@ -336,10 +337,12 @@ int main(int argc, char* argv[])
      */
     if(execute || 1 == getpid())
     {
+        std::string init = Config::get<std::string>("init");
+
         if(execute)
             notice("Execute `%s' ...", execute);
         else
-            notice("Execute `%s' ...", Config::get<std::string>("init").c_str());
+            notice("Execute `%s' ...", init.c_str());
 
         switch(fork())
         {
@@ -356,7 +359,7 @@ int main(int argc, char* argv[])
                         error("system: %s", strerror(errno));
                 }
                 else
-                  execv(Config::get<std::string>("init").c_str(), argv);
+                  execv(init.c_str(), argv);
 
                 exit(0);
          }

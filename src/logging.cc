@@ -49,7 +49,8 @@ void Logging::log2target(LogLevel level, const char* msg)
         if(!file)
             throw std::runtime_error(strerror(errno));
         
-        fprintf(file, "[%s] %s\n", Config::get<std::string>("tool_name").c_str(), msg);
+        std::string tool_name = Config::get<std::string>("tool_name");
+        fprintf(file, "[%s] %s\n", tool_name.c_str(), msg);
         fclose(file);
     }
 }
@@ -121,10 +122,12 @@ void Logging::write(LogLevel level, const char* format, ...)
         else
             out = stdout;
         
-        if(displayToolName)
-            fprintf(out, "[%s] %s\n", Config::get<std::string>("tool_name").c_str(), msg);
-        else
+        if(displayToolName) {
+            std::string tool_name = Config::get<std::string>("tool_name");
+            fprintf(out, "[%s] %s\n", tool_name.c_str(), msg);
+        } else {
             fprintf(out, "%s\n", msg);
+        }
     }
 
     if(!(level & loglevel))
