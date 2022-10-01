@@ -525,7 +525,7 @@ void AuditListener::parseSyscallEvent(auparse_state_t* au, boost::shared_ptr<Aud
     else if(0 == strcmp(sc_name, "execve"))
         auditEvent->type = Execve;
     else if(0 == strcmp(sc_name, "openat"))
-        auditEvent->type = Open;
+        auditEvent->type = OpenAt;
     else if(0 == strcmp(sc_name, "truncate"))
         auditEvent->type = Truncate;
     else if(0 == strcmp(sc_name, "creat"))
@@ -553,7 +553,12 @@ void AuditListener::parseSyscallEvent(auparse_state_t* au, boost::shared_ptr<Aud
     
     if(auditEvent->type == Open || auditEvent->type == OpenAt)
     {
-        int flags = strtol(parseField(au, "a1").c_str(), NULL, 16);
+	std::string flagstr;
+        if (auditEvent->type == Open)
+		flagstr = parseField(au, "a1");
+	else
+		flagstr = parseField(au, "a2");
+        int flags = strtol(flagstr.c_str(), NULL, 16);
         
         if(!(  flags & O_WRONLY
             || flags & O_RDWR
