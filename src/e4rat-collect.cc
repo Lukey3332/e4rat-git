@@ -207,6 +207,10 @@ int main(int argc, char* argv[])
     if(0 == access(startup_log_file.c_str(), F_OK))
         exclude_filenames.push_back(startup_log_file.c_str());
 
+    listener.excludePath("/dev/*");
+    listener.excludePath("/sys/*");
+    listener.excludePath("/proc/*");
+
     static struct option long_options[] =
         {
             {"verbose",        no_argument,       0, 'v'},
