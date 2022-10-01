@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <mntent.h>
+#include <sys/sysmacros.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -216,10 +217,10 @@ int Device::getDevNameFromDevfs()
 int Device::getDevNameFromMajorMinor()
 {
     std::stringstream ss;
-    int major = major(get()->devno);
-    int minor = minor(get()->devno);
+    int _major = major(get()->devno);
+    int _minor = minor(get()->devno);
 
-    switch(major)
+    switch(_major)
     {
         case 0:
             // the minor number of virtual filesystems are allocated dynamically in function set_anon_super() in fs/super.c
@@ -241,10 +242,10 @@ int Device::getDevNameFromMajorMinor()
             return -1;
     }
     
-    ss << (char)(0x61 + (minor >>4));
+    ss << (char)(0x61 + (_minor >>4));
 
 devicename_has_no_letter:
-    ss << (minor & 0b1111);
+    ss << (_minor & 0b1111);
 
     get()->deviceName = ss.str();
     get()->devicePath = "/dev/" + get()->deviceName;

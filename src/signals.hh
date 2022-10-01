@@ -42,7 +42,7 @@
 #include <boost/signals2/signal.hpp>
 
 //get the number of arguments
-#define BIND1ST _1
+#define BIND1ST boost::placeholders::_1
 #define BIND2ST _1,_2
 #define BIND3ST _1,_2,_3
 #define BIND4ST _1,_2,_3,_4

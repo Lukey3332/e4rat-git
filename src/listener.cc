@@ -31,6 +31,8 @@
 #include <cstring>
 #include <linux/limits.h>
 #include <fcntl.h>
+#include <sys/sysmacros.h>
+#include <byteswap.h>
 
 //syscall table
 #include <linux/unistd.h>
