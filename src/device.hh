@@ -21,6 +21,7 @@
 #define DEVICE_HH
 
 #include "common.hh"
+#include <boost/smart_ptr/shared_ptr.hpp>
 #include <string>
 #include <ext2fs/ext2fs.h>
 #include <ext2fs/ext2_fs.h>

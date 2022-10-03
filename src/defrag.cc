@@ -30,6 +30,7 @@
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 #include <mntent.h>
+#include <math.h>
 
 /* opendir*/
 #include <sys/types.h>
