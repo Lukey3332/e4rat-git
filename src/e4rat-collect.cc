@@ -361,6 +361,9 @@ int main(int argc, char* argv[])
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
 
+    // systemd likes to send SIGHUP
+    signal(SIGHUP, SIG_IGN);
+
     if(1 == getpid())
     {
         create_pid_late = true;
