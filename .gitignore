@@ -1,0 +1,13 @@
+*~
+*.o
+.*.swp
+*.so*
+*.deb
+CMakeFiles
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+defrag
+e4rat-collect
+e4rat-preload
+e4rat-realloc
